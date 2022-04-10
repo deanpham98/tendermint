@@ -19,16 +19,16 @@ build_version() {
     local wdir="build-${vers}"
     set -x
     if [[ "$vers" = ambient ]] ; then
-	wdir=".."
-	trap 'set +x' RETURN
+        wdir=".."
+        trap 'set +x' RETURN
     else
-	git worktree add "$wdir" "$vers"
-	trap "git worktree remove '$wdir'; set +x" RETURN
+        git worktree add "$wdir" "$vers"
+        trap "git worktree remove '$wdir'; set +x" RETURN
     fi
     (
-	set -x
-	cd "$wdir"
-	make build
+        set -x
+        cd "$wdir"
+        make build
     )
     mv "${wdir}/build/tendermint" bin/tendermint-"$vers"
 }
