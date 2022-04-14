@@ -29,8 +29,13 @@ build_version() {
         set -x
         cd "$wdir"
         make build
+
+        if [[ -d ./scripts/confix ]] ; then
+            go build -o ./build/confix ./scripts/confix
+        fi
     )
     mv "${wdir}/build/tendermint" bin/tendermint-"$vers"
+    mv "${wdir}/build/confix" bin/confix || true
 }
 
 call() {
@@ -91,7 +96,7 @@ diag "Stopping TM $oldvers"
 kill %1; wait
 
 diag "Updating configuration file ${cfpath}..."
-go run ../scripts/confix -config "$cfpath" -out "$cfpath"
+./bin/confix -config "$cfpath" -out "$cfpath"
 
 diag "Migrating databases with $usevers"
 ./bin/tendermint-"$usevers" --home="$tmhome" key-migrate
