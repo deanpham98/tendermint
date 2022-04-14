@@ -79,7 +79,7 @@ diag "Starting TM $oldvers"
 ./bin/tendermint-"$oldvers" --home="$tmhome" init
 ./bin/tendermint-"$oldvers" --home="$tmhome" start \
                  --proxy_app=kvstore \
-                 --consensus.create_empty_blocks=1 2>/dev/null 1>&2 &
+		 2>/dev/null 1>&2 &
 sleep 2
 
 diag "Adding transactions..."
@@ -98,7 +98,7 @@ diag "Restarting TM $oldvers"
 kill %1; wait
 ./bin/tendermint-"$oldvers" --home="$tmhome" start \
                  --proxy_app=kvstore \
-                 --consensus.create_empty_blocks=1 2>/dev/null 1>&2 &
+		 2>/dev/null 1>&2 &
 sleep 2
 
 check_txn "$hash1" "$hash2" "$hash3"
