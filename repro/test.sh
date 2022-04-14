@@ -72,12 +72,14 @@ for vers in "$oldvers" "$usevers" ; do
     build_version "$vers"
 done
 
-diag "Starting TM $oldvers"
+diag "Cleaning up TM settings"
 rm -fr -- "$tmhome"
+
+diag "Starting TM $oldvers"
 ./bin/tendermint-"$oldvers" --home="$tmhome" init
 ./bin/tendermint-"$oldvers" --home="$tmhome" start \
                  --proxy_app=kvstore \
-                 --consensus.create_empty_blocks=0 2>/dev/null 1>&2 &
+                 --consensus.create_empty_blocks=1 2>/dev/null 1>&2 &
 sleep 2
 
 diag "Adding transactions..."
@@ -91,6 +93,15 @@ diag ":: transaction hash is $hash3"
 check_txn "$hash1" "$hash2" "$hash3"
 
 diag "Height now:" "$(call blockchain | jq -r .result.last_height)"
+
+diag "Restarting TM $oldvers"
+kill %1; wait
+./bin/tendermint-"$oldvers" --home="$tmhome" start \
+                 --proxy_app=kvstore \
+                 --consensus.create_empty_blocks=1 2>/dev/null 1>&2 &
+sleep 2
+
+check_txn "$hash1" "$hash2" "$hash3"
 
 diag "Stopping TM $oldvers"
 kill %1; wait
@@ -106,6 +117,8 @@ diag "Starting TM inspector for $usevers"
 sleep 2
 
 diag "Height now:" "$(call blockchain | jq -r .result.last_height)"
+
+check_txn "$hash1" "$hash2" "$hash3"
 
 diag "Stopping TM inspector $usevers"
 kill %1; wait
