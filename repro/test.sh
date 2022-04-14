@@ -118,4 +118,6 @@ sleep 10
 
 check_txn "$hash1" "$hash2" "$hash3"
 
-kill %1; wait
+diag "Waiting for interrupt, address is http://${addr}/"
+trap 'kill %1; wait' INT
+wait
